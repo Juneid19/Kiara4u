@@ -15,7 +15,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firza Radio Player</title>
+    <title>Kiara4u Radio Player</title>
     <style>
         * {
             margin: 0;
@@ -228,13 +228,13 @@
     
     <div class="player-container">
         <div class="cover-container">
-            <img id="coverArt" class="cover-art" src="https://mytuner.global.ssl.fastly.net/media/tvos_radios/fgdvsznhtpte.jpg" alt="Cover Art">
+            <img id="coverArt" class="cover-art" src="http://cdn.theradiohub.com/logos/157.jpg" alt="Cover Art">
             <div class="neon-effect"></div>
         </div>
         
         <div class="track-info">
             <div class="track-title" id="trackTitle">Memuat informasi lagu...</div>
-            <div class="track-artist" id="trackArtist">Firza Radio</div>
+            <div class="track-artist" id="trackArtist">Kiara 4U</div>
             <div class="track-album" id="trackAlbum">Online Radio</div>
         </div>
         
@@ -268,8 +268,8 @@
         
         // Konfigurasi
         const streamUrl = 'https://eu1.fastcast4u.com/proxy/kiarafm?mp=/1';
-        const nowPlayingUrl = 'http://eu1.fastcast4u.com:21464/currentsong?sid=1';
-        const defaultCover = 'https://mytuner.global.ssl.fastly.net/media/tvos_radios/fgdvsznhtpte.jpg';
+        const nowPlayingUrl = 'http://178.33.135.244:21464/currentsong?sid=1';
+        const defaultCover = 'http://cdn.theradiohub.com/logos/157.jpg';
         
         // State
         let isPlaying = false;
@@ -341,7 +341,7 @@
         function processTrackData(data) {
             if (!data || data.trim() === '') {
                 return {
-                    title: 'Firza Radio',
+                    title: 'Kiara 4U',
                     artist: 'Live Streaming',
                     album: 'Online Radio'
                 };
@@ -350,7 +350,7 @@
             // Coba berbagai format data lagu
             let title = '';
             let artist = '';
-            let album = 'Firza Radio';
+            let album = 'Kiara 4U';
             
             // Format 1: Artist - Title
             if (data.includes(' - ')) {
@@ -372,7 +372,7 @@
             
             // Jika data kosong, gunakan default
             if (!title) {
-                title = 'Firza Radio';
+                title = 'Kiara 4U';
                 artist = 'Live Streaming';
             }
             
@@ -398,7 +398,7 @@
             } catch (error) {
                 console.error('Error dalam updateNowPlaying:', error);
                 // Gunakan nilai default jika terjadi error
-                trackTitle.textContent = 'Firza Radio';
+                trackTitle.textContent = 'Kiara 4U';
                 trackArtist.textContent = 'Live Streaming';
                 trackAlbum.textContent = 'Online Radio';
                 coverArt.src = defaultCover;

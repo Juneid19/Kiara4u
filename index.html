@@ -1,274 +1,252 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<title>Kiara 4U Radio</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Kiara 4U — Neon Player</title>
+
 <style>
+:root {
+  --bg-duration: 2.5s;
+  --ring-blur: 10px;
+}
+
+.cc_streaminfo { display: none !important; }
+
+html,body {
+  height:100%;margin:0;
+}
 body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  text-align: center;
-  color: #fff;
-  background: linear-gradient(135deg,#667eea,#764ba2);
-  transition: background 2s ease-in-out;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(135deg,#140028,#2b0040);
+  color:#fff;
+  transition: background var(--bg-duration) ease;
 }
 
-#player {
-  width: 90%;
-  max-width: 360px;
-  margin: 40px auto;
-  padding: 25px;
-  border-radius: 25px;
-  background: rgba(0,0,0,0.3);
-  box-shadow: 0 0 25px rgba(255,255,255,0.15);
+.card {
+  width: 92%;
+  max-width: 420px;
+  background: rgba(255,255,255,0.04);
+  padding: 20px;
+  border-radius: 16px;
+  text-align:center;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
 }
 
-/* 🎵 COVER + NEON GLOW */
-.cover-wrapper {
+.cover-wrap {
   position: relative;
-  width: 75vw;
-  max-width: 260px;
-  aspect-ratio: 1 / 1;
-  margin: 0 auto;
+  width: 260px;
+  height: 260px;
+  margin: 0 auto 14px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display:grid;
+  place-items:center;
 }
-.cover-ring {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: conic-gradient(#00ffff, #ff00ff, #00ff99, #00ffff);
-  animation: rotate 6s linear infinite, pulseGlow 1.5s ease-in-out infinite alternate;
-  filter: blur(10px);
+
+.ring {
+  position:absolute;
+  inset: -8px;
+  border-radius:50%;
+  background: conic-gradient(from 120deg,#00bfff,#ff00cc,#7a00ff,#00bfff);
+  filter: blur(var(--ring-blur));
   z-index: 0;
+  animation: spin 18s linear infinite, pulse 1.4s ease-in-out infinite alternate;
+  transform: scale(1);
+  transition: transform .45s ease;
 }
-#cover {
-  width: 88%;
-  height: 88%;
-  border-radius: 20px;
+
+@keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+@keyframes pulse { from{transform:scale(.985)} to{transform:scale(1.02)} }
+
+img#cover {
+  width: 86%;
+  height: 86%;
   object-fit: cover;
-  position: relative;
+  border-radius: 18px;
   z-index: 2;
-  box-shadow: 0 0 20px rgba(255,255,255,0.5);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
   opacity: 0;
-  transform: scale(0.95);
-  transition: opacity 1s ease, transform 1s ease;
+  transform: scale(.98);
+  transition: opacity .45s ease, transform .45s ease;
+  background: linear-gradient(180deg,#111,#222);
 }
-.fade-in {
-  opacity: 1 !important;
-  transform: scale(1) !important;
-}
+img#cover.visible { opacity: 1; transform: scale(1); }
 
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-@keyframes pulseGlow {
-  from { opacity: 0.7; transform: scale(1); }
-  to { opacity: 1; transform: scale(1.1); }
-}
+h1 { font-size: 1.25rem; margin: 10px 0 4px; opacity: 0.97; }
+h2 { font-size: 1rem; margin: 0 0 10px; color: rgba(255,255,255,0.86); font-weight:500; }
 
-/* 📝 Text */
-h2, h3 {
-  transition: opacity 0.8s ease;
-  opacity: 0;
-  margin: 0;
-}
-.fade-text { opacity: 1 !important; }
-
-h2 {
-  font-size: 1.4em;
-  margin: 20px 0 5px;
-}
-h3 {
-  font-size: 1em;
-  margin: 0 0 15px;
-  opacity: 0.9;
-}
-
-.live {
-  color: white;
-  font-weight: bold;
-  font-size: 0.95em;
-  margin-top: 5px;
-  text-shadow: 0 0 5px rgba(255,255,255,0.8),
-               0 0 10px rgba(255,255,255,0.6),
-               0 0 20px rgba(255,255,255,0.4);
-  letter-spacing: 0.5px;
-}
-
-/* 🎛️ Controls */
 .controls {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 10px;
+  margin-top:15px;
+  display:flex;
+  gap:14px;
+  justify-content:center;
 }
-button {
-  background: #fff;
-  color: #000;
-  border: none;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  font-size: 1.2em;
-  cursor: pointer;
-  transition: all 0.3s;
+.btn {
+  background:#fff;
+  border:none;
+  border-radius:50%;
+  width:50px;
+  height:50px;
+  font-size:18px;
+  cursor:pointer;
+  color:#000;
+  box-shadow:0 0 12px rgba(255,255,255,0.2);
+  transition:all .3s;
 }
-button:hover {
-  background: #00ffcc;
-  color: #000;
+.btn:hover{
+  background:#ff00cc;
+  color:#fff;
+  box-shadow:0 0 15px #ff00cc,0 0 25px #ff00cc;
+  transform:scale(1.1);
 }
 
-/* 📱 Responsiveness */
-@media (max-width: 480px) {
-  #player { padding: 20px; margin: 30px auto; }
-  h2 { font-size: 1.2em; }
-  h3 { font-size: 0.9em; }
-  .live { font-size: 0.85em; }
-  button {
-    width: 45px;
-    height: 45px;
-    font-size: 1.1em;
-  }
+footer { margin-top:12px; font-size:12px; color:rgba(255,255,255,0.6); }
+
+@media (max-width:420px){
+  .cover-wrap{width:72vw;height:72vw}
+  img#cover{border-radius:14px}
 }
 </style>
 </head>
 <body>
+  <div class="card" role="application" aria-label="Kiara 4U Player">
+    <div class="cover-wrap">
+      <div class="ring" id="ring"></div>
+      <img id="cover" src="http://cdn.theradiohub.com/logos/157.jpg" alt="Cover lagu">
+    </div>
 
-<div id="player">
-  <div class="cover-wrapper">
-    <div class="cover-ring"></div>
-    <img id="cover" src="http://cdn.theradiohub.com/logos/157.jpg" alt="cover">
+    <h1 id="title">Memuat lagu...</h1>
+    <h2 id="artist">Kiara 4U</h2>
+
+    <audio id="audio" preload="none" crossorigin="anonymous">
+      <source src="https://eu1.fastcast4u.com/proxy/kiarafm?mp=/1" type="audio/mpeg">
+      Browser Anda tidak mendukung audio.
+    </audio>
+
+    <div class="controls">
+      <button id="play" class="btn" aria-label="Play">▶</button>
+      <button id="stop" class="btn" aria-label="Stop">⏹</button>
+      <button id="refresh" class="btn" aria-label="Refresh metadata">⟳</button>
+    </div>
+
+    <footer>© Kiara 4U Radio</footer>
   </div>
-  <h2 id="title">Kiara 4U Radio</h2>
-  <h3 id="artist">Streaming Live</h3>
-  <div class="live">LIVE • Kiara 4U Radio</div>
-  <div class="controls">
-    <button id="play">▶</button>
-    <button id="stop">⏹</button>
-    <button id="refresh">⟳</button>
-  </div>
-  <audio id="audio" preload="none"></audio>
-</div>
+
+  <span class="cc_streaminfo" data-type="song" data-username="kiarafm" style="display:none;">Loading...</span>
+  <script src="https://eu1.fastcast4u.com/system/streaminfo.js"></script>
 
 <script>
-// 🎧 Konfigurasi
-const streamURL = "https://eu1.fastcast4u.com/proxy/kiarafm?mp=/1";
-const fallbackCover = "http://cdn.theradiohub.com/logos/157.jpg";
+const POLL_MS = 7000;
+const ITUNES_TIMEOUT = 3000;
+const DEEZER_TIMEOUT = 3000;
 
-const audio = document.getElementById("audio");
-const playBtn = document.getElementById("play");
-const stopBtn = document.getElementById("stop");
-const refreshBtn = document.getElementById("refresh");
-const cover = document.getElementById("cover");
-const titleEl = document.getElementById("title");
-const artistEl = document.getElementById("artist");
+const coverEl = document.getElementById('cover');
+const titleEl = document.getElementById('title');
+const artistEl = document.getElementById('artist');
+const ringEl = document.getElementById('ring');
+const audio = document.getElementById('audio');
+const playBtn = document.getElementById('play');
+const stopBtn = document.getElementById('stop');
+const refreshBtn = document.getElementById('refresh');
 
-audio.src = streamURL;
-let isPlaying = false;
-let lastTrack = "";
+let lastKey = '';
+const cache = new Map();
 
-// ▶️ Tombol
 playBtn.onclick = () => {
-  if (isPlaying) {
-    audio.pause();
-    playBtn.textContent = "▶";
-  } else {
-    audio.play();
-    playBtn.textContent = "⏸";
-  }
-  isPlaying = !isPlaying;
+  if(audio.paused){ audio.play().catch(()=>{}); playBtn.textContent='⏸'; }
+  else { audio.pause(); playBtn.textContent='▶'; }
 };
-
-stopBtn.onclick = () => {
-  audio.pause();
-  audio.currentTime = 0;
-  playBtn.textContent = "▶";
-  isPlaying = false;
-};
-
+stopBtn.onclick = () => { audio.pause(); audio.currentTime = 0; playBtn.textContent='▶'; };
 refreshBtn.onclick = () => fetchNowPlaying(true);
 
-// 🎵 Ambil lagu sekarang
-async function fetchNowPlaying(force = false) {
-  try {
-    const cc = document.querySelector('.cc_streaminfo');
-    const song = cc ? cc.innerText : '';
-    let artist = "Unknown Artist";
-    let title = song;
-
-    if (song.includes(" - ")) {
-      const parts = song.split(" - ");
-      artist = parts[0].trim();
-      title = parts[1].trim();
+function readFastcast(){
+  const el = document.querySelector('.cc_streaminfo[data-username="kiarafm"]');
+  return el ? el.textContent.trim() : '';
+}
+function normalize(s){
+  return (s||'').toLowerCase().replace(/\([^)]*\)/g,'').replace(/feat\.?/g,'')
+    .replace(/ft\.?/g,'').replace(/["“”'‘’]/g,'').replace(/[^\w\s]/g,'')
+    .replace(/\s+/g,' ').trim();
+}
+function fetchTimeout(url, timeout=3000){
+  return Promise.race([
+    fetch(url,{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject()),
+    new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),timeout))
+  ]);
+}
+async function lookupDeezer(artist, title){
+  const q = encodeURIComponent(`${artist} ${title}`);
+  try{
+    const data = await fetchTimeout(`https://api.deezer.com/search?q=${q}&limit=3`,DEEZER_TIMEOUT);
+    if(!data || !data.data) return null;
+    for(const item of data.data){
+      const cover = item.album?.cover_big || item.album?.cover_medium;
+      if(cover) return {cover,source:'deezer'};
     }
-
-    const currentTrack = artist + " - " + title;
-    if (!force && currentTrack === lastTrack) return;
-    lastTrack = currentTrack;
-
-    // 🔍 Cari cover cepat via iTunes
-    let img = "";
-    try {
-      const it = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artist + " " + title)}&limit=1`);
-      const itData = await it.json();
-      if (itData.results?.length > 0) {
-        img = itData.results[0].artworkUrl100.replace("100x100", "600x600");
-      }
-    } catch (e) {}
-
-    // ⏩ Update cepat + animasi zoom
-    cover.classList.remove("fade-in");
-    titleEl.classList.remove("fade-text");
-    artistEl.classList.remove("fade-text");
-
-    setTimeout(() => {
-      cover.src = img || fallbackCover;
-      titleEl.textContent = title;
-      artistEl.textContent = artist;
-      cover.classList.add("fade-in");
-      titleEl.classList.add("fade-text");
-      artistEl.classList.add("fade-text");
-      changeBackgroundColor(title + artist);
-    }, 200);
-  } catch (e) {
-    console.error("Error fetching nowplaying:", e);
-  }
+  }catch{return null;}
+  return null;
 }
-
-// 🌈 Background dinamis
-const colors = [
-  'linear-gradient(135deg,#667eea,#764ba2)',
-  'linear-gradient(135deg,#f093fb,#f5576c)',
-  'linear-gradient(135deg,#4facfe,#00f2fe)',
-  'linear-gradient(135deg,#fa709a,#fee140)',
-  'linear-gradient(135deg,#30cfd0,#330867)'
-];
-let colorIndex = 0;
-function cycleBackground() {
-  colorIndex = (colorIndex + 1) % colors.length;
-  document.body.style.background = colors[colorIndex];
+async function lookupItunes(artist, title){
+  const q = encodeURIComponent(`${artist} ${title}`);
+  try{
+    const data = await fetchTimeout(`https://itunes.apple.com/search?term=${q}&entity=song&limit=3`,ITUNES_TIMEOUT);
+    if(!data.results) return null;
+    const r=data.results[0];
+    return {cover:r.artworkUrl100?.replace('100x100','600x600'),source:'itunes'};
+  }catch{return null;}
 }
-setInterval(cycleBackground, 8000);
-
-function changeBackgroundColor(seed) {
-  const idx = Math.abs(seed.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % colors.length;
-  document.body.style.background = colors[idx];
+async function findCoverParallel(artist,title){
+  const [d,i]=await Promise.allSettled([lookupDeezer(artist,title),lookupItunes(artist,title)]);
+  if(d.status==='fulfilled' && d.value && d.value.cover) return d.value;
+  if(i.status==='fulfilled' && i.value && i.value.cover) return i.value;
+  return null;
 }
-
-// Jalankan pertama kali
+function applyCover(artist,title,coverUrl){
+  ringEl.style.transform='scale(1.06)';
+  clearTimeout(ringEl._rt);
+  ringEl._rt=setTimeout(()=>ringEl.style.transform='scale(1)',600);
+  titleEl.textContent=title||'Sedang bermain...';
+  artistEl.textContent=artist||'Kiara 4U';
+  if(coverEl.src===coverUrl){coverEl.classList.add('visible');return;}
+  coverEl.classList.remove('visible');
+  setTimeout(()=>{
+    coverEl.src=coverUrl||'http://cdn.theradiohub.com/logos/157.jpg';
+    coverEl.onerror=()=>{coverEl.src='http://cdn.theradiohub.com/logos/157.jpg';coverEl.classList.add('visible');};
+    coverEl.onload=()=>coverEl.classList.add('visible');
+  },140);
+}
+async function fetchNowPlaying(force=false){
+  try{
+    const raw=readFastcast();
+    if(!raw)return;
+    let artist='Kiara 4U',title='Sedang bermain...';
+    if(raw.includes(' - ')){
+      const p=raw.split(' - ');
+      artist=p[0].trim();title=p.slice(1).join(' - ').trim();
+    }else if(raw.trim()){title=raw.trim();}
+    const key=(artist+' - '+title).trim();
+    if(!force && key===lastKey)return;
+    lastKey=key;
+    titleEl.textContent=title;artistEl.textContent=artist;
+    if(cache.has(key)){applyCover(artist,title,cache.get(key).cover);return;}
+    const found=await findCoverParallel(artist,title);
+    const coverUrl=(found&&found.cover)||'http://cdn.theradiohub.com/logos/157.jpg';
+    cache.set(key,{cover:coverUrl});
+    applyCover(artist,title,coverUrl);
+  }catch(e){console.warn(e);}
+}
 fetchNowPlaying(true);
-setInterval(fetchNowPlaying, 10000);
+setInterval(fetchNowPlaying,POLL_MS);
+const bgList=[
+  'linear-gradient(135deg,#0b0830,#22002b)',
+  'linear-gradient(135deg,#001028,#230035)',
+  'linear-gradient(135deg,#1b0034,#090014)'
+];
+let bgIdx=0;
+setInterval(()=>{bgIdx=(bgIdx+1)%bgList.length;document.body.style.background=bgList[bgIdx];},14000);
 </script>
-
-<!-- FastCast4U Stream Info -->
-<span class="cc_streaminfo" data-type="song" data-username="kiarafm">Loading ...</span>
-<script src="https://eu1.fastcast4u.com/system/streaminfo.js"></script>
-
 </body>
 </html>

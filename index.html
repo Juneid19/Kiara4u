@@ -11,8 +11,9 @@ body {
   text-align: center;
   color: #fff;
   background: linear-gradient(135deg,#667eea,#764ba2);
-  transition: background 1s ease;
+  transition: background 2s ease-in-out;
 }
+
 #player {
   width: 90%;
   max-width: 360px;
@@ -22,6 +23,8 @@ body {
   background: rgba(0,0,0,0.3);
   box-shadow: 0 0 25px rgba(255,255,255,0.15);
 }
+
+/* 🎵 COVER + NEON GLOW */
 .cover-wrapper {
   position: relative;
   width: 75vw;
@@ -52,9 +55,14 @@ body {
   z-index: 2;
   box-shadow: 0 0 20px rgba(255,255,255,0.5);
   opacity: 0;
-  transition: opacity 1s ease;
+  transform: scale(0.95);
+  transition: opacity 1s ease, transform 1s ease;
 }
-.fade-in { opacity: 1 !important; }
+.fade-in {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}
+
 @keyframes rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -63,14 +71,25 @@ body {
   from { opacity: 0.7; transform: scale(1); }
   to { opacity: 1; transform: scale(1.1); }
 }
+
+/* 📝 Text */
 h2, h3 {
   transition: opacity 0.8s ease;
   opacity: 0;
   margin: 0;
 }
 .fade-text { opacity: 1 !important; }
-h2 { font-size: 1.4em; margin: 20px 0 5px; }
-h3 { font-size: 1em; margin: 0 0 15px; opacity: 0.9; }
+
+h2 {
+  font-size: 1.4em;
+  margin: 20px 0 5px;
+}
+h3 {
+  font-size: 1em;
+  margin: 0 0 15px;
+  opacity: 0.9;
+}
+
 .live {
   color: white;
   font-weight: bold;
@@ -81,6 +100,8 @@ h3 { font-size: 1em; margin: 0 0 15px; opacity: 0.9; }
                0 0 20px rgba(255,255,255,0.4);
   letter-spacing: 0.5px;
 }
+
+/* 🎛️ Controls */
 .controls {
   display: flex;
   justify-content: center;
@@ -102,17 +123,18 @@ button:hover {
   background: #00ffcc;
   color: #000;
 }
+
+/* 📱 Responsiveness */
 @media (max-width: 480px) {
   #player { padding: 20px; margin: 30px auto; }
   h2 { font-size: 1.2em; }
   h3 { font-size: 0.9em; }
   .live { font-size: 0.85em; }
-  button { width: 45px; height: 45px; font-size: 1.1em; }
-}
-@media (max-width: 340px) {
-  #player { padding: 15px; }
-  .cover-wrapper { width: 85vw; }
-  button { width: 40px; height: 40px; }
+  button {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1em;
+  }
 }
 </style>
 </head>
@@ -123,9 +145,9 @@ button:hover {
     <div class="cover-ring"></div>
     <img id="cover" src="http://cdn.theradiohub.com/logos/157.jpg" alt="cover">
   </div>
-  <h2 id="title">Memuat...</h2>
-  <h3 id="artist"><span class="cc_streaminfo" data-type="song" data-username="kiarafm">Loading ...</span></h3>
-  <div class="live">LIVE · Kiara 4U Radio</div>
+  <h2 id="title">Kiara 4U Radio</h2>
+  <h3 id="artist">Streaming Live</h3>
+  <div class="live">LIVE • Kiara 4U Radio</div>
   <div class="controls">
     <button id="play">▶</button>
     <button id="stop">⏹</button>
@@ -134,8 +156,8 @@ button:hover {
   <audio id="audio" preload="none"></audio>
 </div>
 
-<script src="https://eu1.fastcast4u.com/system/streaminfo.js"></script>
 <script>
+// 🎧 Konfigurasi
 const streamURL = "https://eu1.fastcast4u.com/proxy/kiarafm?mp=/1";
 const fallbackCover = "http://cdn.theradiohub.com/logos/157.jpg";
 
@@ -145,12 +167,13 @@ const stopBtn = document.getElementById("stop");
 const refreshBtn = document.getElementById("refresh");
 const cover = document.getElementById("cover");
 const titleEl = document.getElementById("title");
-const songEl = document.querySelector(".cc_streaminfo");
+const artistEl = document.getElementById("artist");
 
 audio.src = streamURL;
 let isPlaying = false;
 let lastTrack = "";
 
+// ▶️ Tombol
 playBtn.onclick = () => {
   if (isPlaying) {
     audio.pause();
@@ -161,34 +184,91 @@ playBtn.onclick = () => {
   }
   isPlaying = !isPlaying;
 };
+
 stopBtn.onclick = () => {
   audio.pause();
   audio.currentTime = 0;
   playBtn.textContent = "▶";
   isPlaying = false;
 };
-refreshBtn.onclick = () => updateTrack(true);
 
-async function updateTrack(force=false){
-  const text = songEl.textContent.trim();
-  if (!text || (!force && text === lastTrack)) return;
-  lastTrack = text;
-  let artist="Unknown", title=text;
-  if (text.includes(" - ")) [artist, title] = text.split(" - ").map(s=>s.trim());
-  titleEl.textContent = title;
-  titleEl.classList.add("fade-text");
+refreshBtn.onclick = () => fetchNowPlaying(true);
 
+// 🎵 Ambil lagu sekarang
+async function fetchNowPlaying(force = false) {
   try {
-    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artist + " " + title)}&limit=1`);
-    const data = await res.json();
-    const img = data.results?.[0]?.artworkUrl100?.replace("100x100","600x600") || fallbackCover;
-    cover.src = img;
-    cover.classList.add("fade-in");
-  } catch {
-    cover.src = fallbackCover;
+    const cc = document.querySelector('.cc_streaminfo');
+    const song = cc ? cc.innerText : '';
+    let artist = "Unknown Artist";
+    let title = song;
+
+    if (song.includes(" - ")) {
+      const parts = song.split(" - ");
+      artist = parts[0].trim();
+      title = parts[1].trim();
+    }
+
+    const currentTrack = artist + " - " + title;
+    if (!force && currentTrack === lastTrack) return;
+    lastTrack = currentTrack;
+
+    // 🔍 Cari cover cepat via iTunes
+    let img = "";
+    try {
+      const it = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artist + " " + title)}&limit=1`);
+      const itData = await it.json();
+      if (itData.results?.length > 0) {
+        img = itData.results[0].artworkUrl100.replace("100x100", "600x600");
+      }
+    } catch (e) {}
+
+    // ⏩ Update cepat + animasi zoom
+    cover.classList.remove("fade-in");
+    titleEl.classList.remove("fade-text");
+    artistEl.classList.remove("fade-text");
+
+    setTimeout(() => {
+      cover.src = img || fallbackCover;
+      titleEl.textContent = title;
+      artistEl.textContent = artist;
+      cover.classList.add("fade-in");
+      titleEl.classList.add("fade-text");
+      artistEl.classList.add("fade-text");
+      changeBackgroundColor(title + artist);
+    }, 200);
+  } catch (e) {
+    console.error("Error fetching nowplaying:", e);
   }
 }
-setInterval(updateTrack, 10000);
+
+// 🌈 Background dinamis
+const colors = [
+  'linear-gradient(135deg,#667eea,#764ba2)',
+  'linear-gradient(135deg,#f093fb,#f5576c)',
+  'linear-gradient(135deg,#4facfe,#00f2fe)',
+  'linear-gradient(135deg,#fa709a,#fee140)',
+  'linear-gradient(135deg,#30cfd0,#330867)'
+];
+let colorIndex = 0;
+function cycleBackground() {
+  colorIndex = (colorIndex + 1) % colors.length;
+  document.body.style.background = colors[colorIndex];
+}
+setInterval(cycleBackground, 8000);
+
+function changeBackgroundColor(seed) {
+  const idx = Math.abs(seed.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % colors.length;
+  document.body.style.background = colors[idx];
+}
+
+// Jalankan pertama kali
+fetchNowPlaying(true);
+setInterval(fetchNowPlaying, 10000);
 </script>
+
+<!-- FastCast4U Stream Info -->
+<span class="cc_streaminfo" data-type="song" data-username="kiarafm">Loading ...</span>
+<script src="https://eu1.fastcast4u.com/system/streaminfo.js"></script>
+
 </body>
 </html>

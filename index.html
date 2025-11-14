@@ -1,252 +1,295 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Kiara 4U — Neon Player</title>
+<meta charset="utf-8">
+<title>KIARA 4U Radio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-:root {
-  --bg-duration: 2.5s;
-  --ring-blur: 10px;
-}
-
-.cc_streaminfo { display: none !important; }
-
-html,body {
-  height:100%;margin:0;
-}
 body {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  background: linear-gradient(135deg,#140028,#2b0040);
-  color:#fff;
-  transition: background var(--bg-duration) ease;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(135deg,#667eea,#764ba2);
+  transition: background 1s ease;
 }
 
-.card {
-  width: 92%;
-  max-width: 420px;
-  background: rgba(255,255,255,0.04);
-  padding: 20px;
-  border-radius: 16px;
-  text-align:center;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+#player {
+  width: 90%;
+  max-width: 360px;
+  margin: 40px auto;
+  padding: 25px;
+  border-radius: 25px;
+  background: rgba(0,0,0,0.3);
+  box-shadow: 0 0 25px rgba(255,255,255,0.15);
 }
 
-.cover-wrap {
+/* COVER + RING */
+.cover-wrapper {
   position: relative;
-  width: 260px;
-  height: 260px;
-  margin: 0 auto 14px;
+  width: 75vw;
+  max-width: 260px;
+  aspect-ratio: 1;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 🌈 Lingkaran glow — sekarang di belakang cover */
+.cover-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  display:grid;
-  place-items:center;
+  background: conic-gradient(#00ffff,#ff00ff,#00ff99,#00ffff);
+  animation: rotate 6s linear infinite, pulseGlow 1.5s ease-in-out infinite alternate;
+  filter: blur(10px);
+  z-index: 1;
 }
 
-.ring {
-  position:absolute;
-  inset: -8px;
-  border-radius:50%;
-  background: conic-gradient(from 120deg,#00bfff,#ff00cc,#7a00ff,#00bfff);
-  filter: blur(var(--ring-blur));
-  z-index: 0;
-  animation: spin 18s linear infinite, pulse 1.4s ease-in-out infinite alternate;
-  transform: scale(1);
-  transition: transform .45s ease;
-}
-
-@keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
-@keyframes pulse { from{transform:scale(.985)} to{transform:scale(1.02)} }
-
-img#cover {
-  width: 86%;
-  height: 86%;
+#cover {
+  width: 88%;
+  height: 88%;
+  border-radius: 20px;
   object-fit: cover;
-  border-radius: 18px;
-  z-index: 2;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
   opacity: 0;
-  transform: scale(.98);
-  transition: opacity .45s ease, transform .45s ease;
-  background: linear-gradient(180deg,#111,#222);
+  transition: opacity 1s ease;
+  box-shadow: 0 0 20px rgba(255,255,255,0.5);
+  z-index: 2; /* 🔥 Cover selalu di depan ring */
 }
-img#cover.visible { opacity: 1; transform: scale(1); }
 
-h1 { font-size: 1.25rem; margin: 10px 0 4px; opacity: 0.97; }
-h2 { font-size: 1rem; margin: 0 0 10px; color: rgba(255,255,255,0.86); font-weight:500; }
+.fade-in { opacity: 1 !important; }
 
+@keyframes rotate {
+  from { transform: rotate(0); }
+  to { transform: rotate(360deg); }
+}
+@keyframes pulseGlow {
+  from { opacity: 0.7; transform: scale(1); }
+  to { opacity: 1; transform: scale(1.1); }
+}
+
+/* TEXT */
+h2, h3 {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  margin: 0;
+}
+.fade-text { opacity: 1 !important; }
+
+h2 { font-size: 1.4em; margin-top: 20px; }
+h3 { font-size: 1em; margin-bottom: 15px; opacity: 0.9; }
+
+.live {
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.95em;
+  margin-top: 5px;
+  text-shadow: 0 0 8px rgba(255,255,255,0.8);
+}
+
+/* BUTTONS */
 .controls {
-  margin-top:15px;
-  display:flex;
-  gap:14px;
-  justify-content:center;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
 }
-.btn {
-  background:#fff;
-  border:none;
-  border-radius:50%;
-  width:50px;
-  height:50px;
-  font-size:18px;
-  cursor:pointer;
-  color:#000;
-  box-shadow:0 0 12px rgba(255,255,255,0.2);
-  transition:all .3s;
+button {
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: 0.25s;
 }
-.btn:hover{
-  background:#ff00cc;
-  color:#fff;
-  box-shadow:0 0 15px #ff00cc,0 0 25px #ff00cc;
-  transform:scale(1.1);
+button:hover {
+  background: #00ffcc;
 }
 
-footer { margin-top:12px; font-size:12px; color:rgba(255,255,255,0.6); }
-
-@media (max-width:420px){
-  .cover-wrap{width:72vw;height:72vw}
-  img#cover{border-radius:14px}
+/* RESPONSIVE */
+@media(max-width:480px){
+  h2{font-size:1.2em;}
+  h3{font-size:0.9em;}
+  button{width:45px;height:45px;font-size:1.1em;}
 }
 </style>
 </head>
+
 <body>
-  <div class="card" role="application" aria-label="Kiara 4U Player">
-    <div class="cover-wrap">
-      <div class="ring" id="ring"></div>
-      <img id="cover" src="http://cdn.theradiohub.com/logos/157.jpg" alt="Cover lagu">
-    </div>
 
-    <h1 id="title">Memuat lagu...</h1>
-    <h2 id="artist">Kiara 4U</h2>
+<!-- ✔ Hilangkan semua output FastCast bawaan -->
+<style>
+.cc_streaminfo, .cc_streaminfo_container, [class*="cc_"] {
+    display:none !important;
+}
+</style>
 
-    <audio id="audio" preload="none" crossorigin="anonymous">
-      <source src="https://eu1.fastcast4u.com/proxy/kiarafm?mp=/1" type="audio/mpeg">
-      Browser Anda tidak mendukung audio.
-    </audio>
+<!-- FastCast input hidden -->
+<span class="cc_streaminfo" data-type="song" data-username="kiarafm" id="fcast"></span>
+<script src="https://eu1.fastcast4u.com/system/streaminfo.js"></script>
 
-    <div class="controls">
-      <button id="play" class="btn" aria-label="Play">▶</button>
-      <button id="stop" class="btn" aria-label="Stop">⏹</button>
-      <button id="refresh" class="btn" aria-label="Refresh metadata">⟳</button>
-    </div>
+<div id="player">
 
-    <footer>© Kiara 4U Radio</footer>
+  <div class="cover-wrapper">
+      <div class="cover-ring"></div>
+      <img id="cover" src="http://cdn.theradiohub.com/logos/157.jpg">
   </div>
 
-  <span class="cc_streaminfo" data-type="song" data-username="kiarafm" style="display:none;">Loading...</span>
-  <script src="https://eu1.fastcast4u.com/system/streaminfo.js"></script>
+  <h2 id="title">KIARA 4U</h2>
+  <h3 id="artist">Streaming Live</h3>
+
+  <div class="live">LIVE • KIARA 4U RADIO</div>
+
+  <div class="controls">
+      <button id="play">▶</button>
+      <button id="stop">⏹</button>
+      <button id="refresh">⟳</button>
+  </div>
+
+  <audio id="audio" preload="none"></audio>
+
+</div>
 
 <script>
-const POLL_MS = 7000;
-const ITUNES_TIMEOUT = 3000;
-const DEEZER_TIMEOUT = 3000;
+const streamURL = "https://eu1.fastcast4u.com/proxy/kiarafm?mp=/1";
+const fallbackCover = "http://cdn.theradiohub.com/logos/157.jpg";
 
-const coverEl = document.getElementById('cover');
-const titleEl = document.getElementById('title');
-const artistEl = document.getElementById('artist');
-const ringEl = document.getElementById('ring');
-const audio = document.getElementById('audio');
-const playBtn = document.getElementById('play');
-const stopBtn = document.getElementById('stop');
-const refreshBtn = document.getElementById('refresh');
+const audio = document.getElementById("audio");
+const playBtn = document.getElementById("play");
+const stopBtn = document.getElementById("stop");
+const refreshBtn = document.getElementById("refresh");
+const cover = document.getElementById("cover");
+const titleEl = document.getElementById("title");
+const artistEl = document.getElementById("artist");
 
-let lastKey = '';
-const cache = new Map();
+audio.src = streamURL;
 
+let isPlaying = false;
+let lastTrack = "";
+
+/* PLAY BUTTON */
 playBtn.onclick = () => {
-  if(audio.paused){ audio.play().catch(()=>{}); playBtn.textContent='⏸'; }
-  else { audio.pause(); playBtn.textContent='▶'; }
+  if (isPlaying) {
+    audio.pause();
+    playBtn.textContent = "▶";
+  } else {
+    audio.play();
+    playBtn.textContent = "⏸";
+  }
+  isPlaying = !isPlaying;
 };
-stopBtn.onclick = () => { audio.pause(); audio.currentTime = 0; playBtn.textContent='▶'; };
+
+/* STOP BUTTON */
+stopBtn.onclick = () => {
+  audio.pause();
+  audio.currentTime = 0;
+  playBtn.textContent = "▶";
+  isPlaying = false;
+};
+
+/* REFRESH BUTTON */
 refreshBtn.onclick = () => fetchNowPlaying(true);
 
-function readFastcast(){
-  const el = document.querySelector('.cc_streaminfo[data-username="kiarafm"]');
-  return el ? el.textContent.trim() : '';
-}
-function normalize(s){
-  return (s||'').toLowerCase().replace(/\([^)]*\)/g,'').replace(/feat\.?/g,'')
-    .replace(/ft\.?/g,'').replace(/["“”'‘’]/g,'').replace(/[^\w\s]/g,'')
-    .replace(/\s+/g,' ').trim();
-}
-function fetchTimeout(url, timeout=3000){
-  return Promise.race([
-    fetch(url,{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject()),
-    new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),timeout))
-  ]);
-}
-async function lookupDeezer(artist, title){
-  const q = encodeURIComponent(`${artist} ${title}`);
-  try{
-    const data = await fetchTimeout(`https://api.deezer.com/search?q=${q}&limit=3`,DEEZER_TIMEOUT);
-    if(!data || !data.data) return null;
-    for(const item of data.data){
-      const cover = item.album?.cover_big || item.album?.cover_medium;
-      if(cover) return {cover,source:'deezer'};
+
+/* ---------------------------
+   FASTCAST NOW PLAYING
+---------------------------- */
+async function fetchNowPlaying(forceUpdate = false) {
+    let raw = document.getElementById("fcast").innerText.trim();
+    if (!raw) return;
+
+    let artist = "Unknown Artist";
+    let title = raw;
+
+    if (raw.includes(" - ")) {
+        const p = raw.split(" - ");
+        artist = p[0].trim();
+        title = p[1].trim();
     }
-  }catch{return null;}
-  return null;
+
+    const trackKey = artist + " - " + title;
+    if (!forceUpdate && trackKey === lastTrack) return;
+    lastTrack = trackKey;
+
+    /* COVER: Deezer → iTunes */
+    let img = "";
+
+    async function getDeezerCover(artist,title){
+        try{
+            const q = `artist:"${artist}" track:"${title}"`;
+            const url = "https://api.deezer.com/search?q=" + encodeURIComponent(q);
+            const r = await fetch(url);
+            const j = await r.json();
+            if (j.data && j.data.length>0){
+                const alb = j.data[0].album || {};
+                return alb.cover_xl || alb.cover_big || alb.cover_medium || null;
+            }
+        }catch{}
+        return null;
+    }
+
+    img = await getDeezerCover(artist,title);
+
+    if (!img) {
+        try {
+            const it = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artist+" "+title)}&limit=1`);
+            const data = await it.json();
+            if (data.results?.length>0) {
+                img = data.results[0].artworkUrl100.replace("100x100","600x600");
+            }
+        } catch {}
+    }
+
+    cover.classList.remove("fade-in");
+    titleEl.classList.remove("fade-text");
+    artistEl.classList.remove("fade-text");
+
+    setTimeout(() => {
+        cover.src = img || fallbackCover;
+        titleEl.textContent = title;
+        artistEl.textContent = artist;
+        cover.classList.add("fade-in");
+        titleEl.classList.add("fade-text");
+        artistEl.classList.add("fade-text");
+        changeBG(title+artist);
+    },400);
 }
-async function lookupItunes(artist, title){
-  const q = encodeURIComponent(`${artist} ${title}`);
-  try{
-    const data = await fetchTimeout(`https://itunes.apple.com/search?term=${q}&entity=song&limit=3`,ITUNES_TIMEOUT);
-    if(!data.results) return null;
-    const r=data.results[0];
-    return {cover:r.artworkUrl100?.replace('100x100','600x600'),source:'itunes'};
-  }catch{return null;}
-}
-async function findCoverParallel(artist,title){
-  const [d,i]=await Promise.allSettled([lookupDeezer(artist,title),lookupItunes(artist,title)]);
-  if(d.status==='fulfilled' && d.value && d.value.cover) return d.value;
-  if(i.status==='fulfilled' && i.value && i.value.cover) return i.value;
-  return null;
-}
-function applyCover(artist,title,coverUrl){
-  ringEl.style.transform='scale(1.06)';
-  clearTimeout(ringEl._rt);
-  ringEl._rt=setTimeout(()=>ringEl.style.transform='scale(1)',600);
-  titleEl.textContent=title||'Sedang bermain...';
-  artistEl.textContent=artist||'Kiara 4U';
-  if(coverEl.src===coverUrl){coverEl.classList.add('visible');return;}
-  coverEl.classList.remove('visible');
-  setTimeout(()=>{
-    coverEl.src=coverUrl||'http://cdn.theradiohub.com/logos/157.jpg';
-    coverEl.onerror=()=>{coverEl.src='http://cdn.theradiohub.com/logos/157.jpg';coverEl.classList.add('visible');};
-    coverEl.onload=()=>coverEl.classList.add('visible');
-  },140);
-}
-async function fetchNowPlaying(force=false){
-  try{
-    const raw=readFastcast();
-    if(!raw)return;
-    let artist='Kiara 4U',title='Sedang bermain...';
-    if(raw.includes(' - ')){
-      const p=raw.split(' - ');
-      artist=p[0].trim();title=p.slice(1).join(' - ').trim();
-    }else if(raw.trim()){title=raw.trim();}
-    const key=(artist+' - '+title).trim();
-    if(!force && key===lastKey)return;
-    lastKey=key;
-    titleEl.textContent=title;artistEl.textContent=artist;
-    if(cache.has(key)){applyCover(artist,title,cache.get(key).cover);return;}
-    const found=await findCoverParallel(artist,title);
-    const coverUrl=(found&&found.cover)||'http://cdn.theradiohub.com/logos/157.jpg';
-    cache.set(key,{cover:coverUrl});
-    applyCover(artist,title,coverUrl);
-  }catch(e){console.warn(e);}
-}
-fetchNowPlaying(true);
-setInterval(fetchNowPlaying,POLL_MS);
-const bgList=[
-  'linear-gradient(135deg,#0b0830,#22002b)',
-  'linear-gradient(135deg,#001028,#230035)',
-  'linear-gradient(135deg,#1b0034,#090014)'
+
+
+/* ---------------------------
+   BACKGROUND COLOR
+---------------------------- */
+const colors = [
+  'linear-gradient(135deg,#667eea,#764ba2)',
+  'linear-gradient(135deg,#f093fb,#f5576c)',
+  'linear-gradient(135deg,#4facfe,#00f2fe)',
+  'linear-gradient(135deg,#fa709a,#fee140)',
+  'linear-gradient(135deg,#30cfd0,#330867)'
 ];
-let bgIdx=0;
-setInterval(()=>{bgIdx=(bgIdx+1)%bgList.length;document.body.style.background=bgList[bgIdx];},14000);
+
+let idx = 0;
+
+function cycleBG(){
+  idx = (idx+1)%colors.length;
+  document.body.style.background = colors[idx];
+}
+setInterval(cycleBG,15000);
+
+function changeBG(seed){
+  const x = Math.abs(seed.split('').reduce((a,c)=>a+c.charCodeAt(0),0));
+  document.body.style.background = colors[x % colors.length];
+}
+
+/* RUN */
+setInterval(fetchNowPlaying,4000);
+fetchNowPlaying(true);
 </script>
+
 </body>
 </html>
